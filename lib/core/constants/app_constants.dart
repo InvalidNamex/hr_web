@@ -1,14 +1,14 @@
-import 'package:flutter/foundation.dart';
-
 class AppConstants {
   AppConstants._();
 
   static const String _remoteUrl = 'https://natureccmpany.homeip.net:57571';
-  static const String _proxyUrl = 'http://localhost:8080';
 
-  /// On web, traffic goes through the local CORS proxy.
-  /// On mobile/desktop, we connect directly (SSL override handles the cert).
-  static String get baseUrl => kIsWeb ? _proxyUrl : _remoteUrl;
+  /// Override with `--dart-define=API_BASE_URL=...` when building.
+  /// Defaults to the production API so hosted web builds do not point to localhost.
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: _remoteUrl,
+  );
 
   static const String serviceKey = '1111111';
   static const String tokenKey = 'jwt_token';
