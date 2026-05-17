@@ -1,0 +1,31 @@
+info:
+  name: Undo Execute Vacation
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/Web/UndoExecuteVacation"
+  headers:
+    - name: ServiceKey
+      value: "1111111"
+  body:
+    type: json
+    data: |-
+      {
+        "empReqMasterID": 1,
+        "vacReqDetailID": 1,
+        "empId": 1
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://natureccmpany.homeip.net:57571
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

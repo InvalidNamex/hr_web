@@ -1,0 +1,12 @@
+info:
+  name: Web
+  type: folder
+  seq: 1
+
+request:
+  auth:
+    type: bearer
+    token: "{{jwt_token}}"
+  variables:
+    - name: jwt_token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjEwMSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJheUBtYWlsLmNvbSIsImV4cCI6MTc3NTIyNTYzOSwiaXNzIjoiSFIgUmVxdWV0cyIsImF1ZCI6Imh0dHBzOi8vbmF0dXJlY2NtcGFueS5ob21laXAubmV0OjU3NTcxIn0.-fQskMKM4P855Ij5ESsvQ7yBeRDhMCzIjZG_fpzQXfU

@@ -1,0 +1,33 @@
+info:
+  name: Login
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/Web/Login"
+  headers:
+    - name: ServiceKey
+      value: "1111111"
+  body:
+    type: json
+    data: |-
+      {
+        "Username": "ay@mail.com",
+        "Password": "P@ssw0rd"
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://natureccmpany.homeip.net:57571
+  scripts:
+    - type: tests
+      code: bru.setEnvVar("jwt_token", res.body.data.token);
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,23 @@
+info:
+  name: Get Request Types
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/Web/GetRequestType"
+  headers:
+    - name: ServiceKey
+      value: "1111111"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://natureccmpany.homeip.net:57571
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

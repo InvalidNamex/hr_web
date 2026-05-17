@@ -1,0 +1,30 @@
+info:
+  name: Get Request Info
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseUrl}}/api/Web/GetRequestInfo?empReqMasterID=2&requestID=1"
+  headers:
+    - name: ServiceKey
+      value: "1111111"
+  params:
+    - name: empReqMasterID
+      value: "2"
+      type: query
+    - name: requestID
+      value: "1"
+      type: query
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://natureccmpany.homeip.net:57571
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
