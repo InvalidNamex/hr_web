@@ -434,10 +434,12 @@ class _StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveColor = color ?? Theme.of(context).colorScheme.primary;
     return FilterChip(
-      label: Text(label, style: const TextStyle(fontSize: 12)),
+      label: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
       selected: selected,
       selectedColor: effectiveColor.withValues(alpha: 0.15),
       checkmarkColor: effectiveColor,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide.none),
       labelStyle: selected ? TextStyle(color: effectiveColor) : null,
       onSelected: (_) => onTap(),
     );
@@ -466,73 +468,97 @@ class _RequestTile extends StatelessWidget {
         : item.requestDate;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 4,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: _statusColor(context, item.status ?? ''),
-                  borderRadius: BorderRadius.circular(2),
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: _statusColor(context, item.status ?? ''),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.localizedEmployeeName(langCode),
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall
-                          ?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(height: 4),
-                    if (item.localizedTypeName(langCode).isNotEmpty)
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        item.localizedTypeName(langCode),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
+                        item.localizedEmployeeName(langCode),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w600),
                       ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        if (date != null) ...[  
-                          Icon(Icons.calendar_today_outlined,
-                              size: 12,
-                              color: Theme.of(context).colorScheme.outline),
-                          const SizedBox(width: 4),
-                          Text(date,
-                              style: Theme.of(context).textTheme.bodySmall),
-                          const SizedBox(width: 12),
+                      const SizedBox(height: 6),
+                      if (item.localizedTypeName(langCode).isNotEmpty)
+                        Text(
+                          item.localizedTypeName(langCode),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                        ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          if (date != null) ...[  
+                            Icon(Icons.calendar_today_outlined,
+                                size: 14,
+                                color: Theme.of(context).colorScheme.outline),
+                            const SizedBox(width: 6),
+                            Text(date,
+                                style: Theme.of(context).textTheme.bodySmall),
+                            const SizedBox(width: 16),
+                          ],
+                          if (item.status != null && item.status!.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _statusColor(context, item.status ?? '').withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                item.localizedStatus(langCode),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color:
+                                          _statusColor(context, item.status ?? ''),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 11,
+                                    ),
+                              ),
+                            ),
                         ],
-                        if (item.status != null && item.status!.isNotEmpty)
-                          Text(
-                            item.localizedStatus(langCode),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                  color:
-                                      _statusColor(context, item.status ?? ''),
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.chevron_right),
-            ],
+                const Icon(Icons.chevron_right),
+              ],
+            ),
           ),
         ),
       ),
@@ -563,34 +589,46 @@ class _SummaryBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final surface = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
     return Container(
-      color: surface,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _SummaryItem(
-            label: l.summaryTotal,
-            count: totalCount,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
-          _SummaryItem(
-            label: l.statusPending,
-            count: pendingCount,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          _SummaryItem(
-            label: l.statusApproved,
-            count: approvedCount,
-            color: Colors.green,
-          ),
-          _SummaryItem(
-            label: l.statusRejected,
-            count: rejectedCount,
-            color: Colors.red,
-          ),
+      decoration: BoxDecoration(
+        color: surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          )
         ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _SummaryItem(
+              label: l.summaryTotal,
+              count: totalCount,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+            _SummaryItem(
+              label: l.statusPending,
+              count: pendingCount,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            _SummaryItem(
+              label: l.statusApproved,
+              count: approvedCount,
+              color: Colors.green,
+            ),
+            _SummaryItem(
+              label: l.statusRejected,
+              count: rejectedCount,
+              color: Colors.red,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -201,8 +201,22 @@ class _DetailBody extends StatelessWidget {
             children: [
               // ── Header card ──────────────────────────────────────────
               Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -243,8 +257,22 @@ class _DetailBody extends StatelessWidget {
 
               // ── Dates card ───────────────────────────────────────────
               Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(24),
                   child: Row(
                     children: [
                       Expanded(
@@ -295,8 +323,22 @@ class _DetailBody extends StatelessWidget {
 
               // ── Status card ──────────────────────────────────────────
               Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                elevation: 0,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -322,9 +364,23 @@ class _DetailBody extends StatelessWidget {
               if (chips.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Wrap(
-                  spacing: 8,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: chips
-                      .map((c) => Chip(label: Text(c)))
+                      .map((c) => Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: Text(
+                              c,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ))
                       .toList(),
                 ),
               ],
@@ -461,17 +517,31 @@ class _ApprovalFlowCard extends StatelessWidget {
     if (steps.isEmpty) return const SizedBox.shrink();
 
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardTheme.color,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l.approvalFlow,
-              style: theme.textTheme.titleSmall
-                  ?.copyWith(color: colorScheme.outline),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(color: colorScheme.outline, fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             ...steps.map((s) => _FlowStepTile(
                   step: s,
                   langCode: langCode,

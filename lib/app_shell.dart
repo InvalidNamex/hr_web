@@ -92,13 +92,33 @@ class _DrawerContent extends StatelessWidget {
       color: colorScheme.surface,
       child: Column(
         children: [
-          DrawerHeader(
-            decoration: BoxDecoration(color: colorScheme.primaryContainer),
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 48, 16, 24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  colorScheme.primaryContainer,
+                  colorScheme.primaryContainer.withValues(alpha: 0.7),
+                ],
+              ),
+            ),
             child: Row(
               children: [
-                Icon(Icons.admin_panel_settings_rounded,
-                    size: 40, color: colorScheme.onPrimaryContainer),
-                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Image.asset(
+                    'assets/logo.png',
+                    height: 36,
+                    width: 36,
+                  ),
+                ),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     l.appTitle,
@@ -116,18 +136,34 @@ class _DrawerContent extends StatelessWidget {
               builder: (context, state) {
                 if (state is RequestTypesLoaded) {
                   return ListView(
-                    padding: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     children: state.types.map((type) {
                       final route = '/requests/${type.id}';
                       final selected = location.startsWith(route);
-                      return ListTile(
-                        selected: selected,
-                        leading: const Icon(Icons.folder_outlined),
-                        title: Text(type.localizedName(langCode)),
-                        onTap: () {
-                          onNav(route);
-                          context.go(route);
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: ListTile(
+                          selected: selected,
+                          selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          leading: Icon(
+                            Icons.folder_outlined,
+                            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                          ),
+                          title: Text(
+                            type.localizedName(langCode),
+                            style: TextStyle(
+                              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                              color: selected ? colorScheme.primary : colorScheme.onSurface,
+                            ),
+                          ),
+                          onTap: () {
+                            onNav(route);
+                            context.go(route);
+                          },
+                        ),
                       );
                     }).toList(),
                   );
@@ -150,32 +186,49 @@ class _DrawerContent extends StatelessWidget {
             ),
           ),
           const Divider(height: 1),
-          // Language toggle
-          ListTile(
-            leading: const Icon(Icons.language),
-            title: Text(l.language),
-            trailing: Text(
-              langCode == 'en' ? 'عربي' : 'EN',
-              style: TextStyle(
-                  color: colorScheme.primary, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Column(
+              children: [
+                ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  leading: const Icon(Icons.language),
+                  title: Text(l.language),
+                  trailing: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      langCode == 'en' ? 'عربي' : 'EN',
+                      style: TextStyle(
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  onTap: () => context.read<LocaleCubit>().toggleLocale(),
+                ),
+                ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  leading: Icon(themeMode == ThemeMode.dark
+                      ? Icons.light_mode
+                      : Icons.dark_mode),
+                  title: Text(themeMode == ThemeMode.dark ? l.lightMode : l.darkMode),
+                  onTap: () => context.read<ThemeCubit>().toggleTheme(),
+                ),
+                ListTile(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  leading: const Icon(Icons.logout),
+                  title: Text(l.logout),
+                  onTap: () {
+                    context.read<AuthCubit>().logout();
+                  },
+                ),
+              ],
             ),
-            onTap: () => context.read<LocaleCubit>().toggleLocale(),
-          ),
-          // Theme toggle
-          ListTile(
-            leading: Icon(themeMode == ThemeMode.dark
-                ? Icons.light_mode
-                : Icons.dark_mode),
-            title: Text(themeMode == ThemeMode.dark ? l.lightMode : l.darkMode),
-            onTap: () => context.read<ThemeCubit>().toggleTheme(),
-          ),
-          // Logout
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: Text(l.logout),
-            onTap: () {
-              context.read<AuthCubit>().logout();
-            },
           ),
           const SizedBox(height: 8),
         ],
