@@ -1,0 +1,3 @@
+# Override .gitignore so Vercel CLI uploads the pre-built output
+!build
+!build/**

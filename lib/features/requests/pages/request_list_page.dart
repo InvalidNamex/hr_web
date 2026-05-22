@@ -128,123 +128,145 @@ class _RequestListPageState extends State<RequestListPage> {
     final l = AppLocalizations.of(context);
     final langCode = context.watch<LocaleCubit>().state.locale.languageCode;
 
-    return BlocBuilder<RequestListCubit, RequestListState>(
-      builder: (context, state) {
-        if (state is RequestListLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is RequestListError) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+    return Column(
+      children: [
+        // ── Back button ────────────────────────────────────────────
+        InkWell(
+          onTap: () => context.canPop() ? context.pop() : context.go('/'),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
               children: [
-                Text(state.message),
-                const SizedBox(height: 12),
-                FilledButton(
-                  onPressed: () => context
-                      .read<RequestListCubit>()
-                      .loadRequests(widget.typeId),
-                  child: Text(l.retry),
-                ),
+                const Icon(Icons.arrow_back, size: 20),
+                const SizedBox(width: 8),
+                Text(l.requests,
+                    style: Theme.of(context).textTheme.titleSmall),
               ],
             ),
-          );
-        }
+          ),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: BlocBuilder<RequestListCubit, RequestListState>(
+            builder: (context, state) {
+              if (state is RequestListLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        if (state is RequestListLoaded) {
-          final allItems = state.items;
-          final filtered = _applyFilters(allItems, langCode);
-
-          // Summary counts from ALL loaded items (not filtered)
-          final pendingCount =
-              allItems.where((i) => _rawStatus(i) == 0).length;
-          final approvedCount =
-              allItems.where((i) => _rawStatus(i) == 1).length;
-          final rejectedCount =
-              allItems.where((i) => _rawStatus(i) == 2).length;
-
-          return Column(
-            children: [
-              // ── Filter bar ─────────────────────────────────────────
-              _FilterBar(
-                l: l,
-                langCode: langCode,
-                statusFilter: _statusFilter,
-                searchController: _searchController,
-                fromDate: _fromDate,
-                toDate: _toDate,
-                hasActiveFilter: _hasActiveFilter,
-                onStatusChanged: (v) => setState(() => _statusFilter = v),
-                onNameChanged: (v) => setState(() => _nameQuery = v),
-                onDatePick: _pickDateRange,
-                onClearDates: () =>
-                    setState(() {
-                      _fromDate = null;
-                      _toDate = null;
-                    }),
-                onClearAll: _clearFilters,
-              ),
-              const Divider(height: 1),
-
-              // ── List ───────────────────────────────────────────────
-              Expanded(
-                child: filtered.isEmpty
-                    ? Center(child: Text(l.noData))
-                    : RefreshIndicator(
-                        onRefresh: () =>
-                            context.read<RequestListCubit>().refresh(),
-                        child: ListView.builder(
-                          controller: _scrollController,
-                          padding:
-                              const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                          itemCount:
-                              filtered.length + (state.hasMore ? 1 : 0),
-                          itemBuilder: (context, index) {
-                            if (index == filtered.length) {
-                              return const Padding(
-                                padding:
-                                    EdgeInsets.symmetric(vertical: 24),
-                                child:
-                                    Center(child: CircularProgressIndicator()),
-                              );
-                            }
-                            final item = filtered[index];
-                            return _RequestTile(
-                              item: item,
-                              langCode: langCode,
-                              onTap: () async {
-                                await context.push(
-                                  '/requests/${widget.typeId}/${item.empReqMasterId}',
-                                  extra: item.requestId,
-                                );
-                                if (context.mounted) {
-                                  context
-                                      .read<RequestListCubit>()
-                                      .refresh();
-                                }
-                              },
-                            );
-                          },
-                        ),
+              if (state is RequestListError) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(state.message),
+                      const SizedBox(height: 12),
+                      FilledButton(
+                        onPressed: () => context
+                            .read<RequestListCubit>()
+                            .loadRequests(widget.typeId),
+                        child: Text(l.retry),
                       ),
-              ),
+                    ],
+                  ),
+                );
+              }
 
-              // ── Summary bar ────────────────────────────────────────
-              _SummaryBar(
-                totalCount: state.totalCount,
-                loadedCount: allItems.length,
-                pendingCount: pendingCount,
-                approvedCount: approvedCount,
-                rejectedCount: rejectedCount,
-                l: l,
-              ),
-            ],
-          );
-        }
+              if (state is RequestListLoaded) {
+                final allItems = state.items;
+                final filtered = _applyFilters(allItems, langCode);
 
-        return const SizedBox.shrink();
-      },
+                // Use API summary if available, otherwise fall back to client-computed counts
+                final summary = state.summary;
+                final pendingCount = summary?.pendingCount ??
+                    allItems.where((i) => _rawStatus(i) == 0).length;
+                final approvedCount = summary?.approvedCount ??
+                    allItems.where((i) => _rawStatus(i) == 1).length;
+                final rejectedCount = summary?.rejectedCount ??
+                    allItems.where((i) => _rawStatus(i) == 2).length;
+
+                return Column(
+                  children: [
+                    // ── Filter bar ─────────────────────────────────────────
+                    _FilterBar(
+                      l: l,
+                      langCode: langCode,
+                      statusFilter: _statusFilter,
+                      searchController: _searchController,
+                      fromDate: _fromDate,
+                      toDate: _toDate,
+                      hasActiveFilter: _hasActiveFilter,
+                      onStatusChanged: (v) => setState(() => _statusFilter = v),
+                      onNameChanged: (v) => setState(() => _nameQuery = v),
+                      onDatePick: _pickDateRange,
+                      onClearDates: () => setState(() {
+                        _fromDate = null;
+                        _toDate = null;
+                      }),
+                      onClearAll: _clearFilters,
+                    ),
+                    const Divider(height: 1),
+
+                    // ── List ───────────────────────────────────────────────
+                    Expanded(
+                      child: filtered.isEmpty
+                          ? Center(child: Text(l.noData))
+                          : RefreshIndicator(
+                              onRefresh: () =>
+                                  context.read<RequestListCubit>().refresh(),
+                              child: ListView.builder(
+                                controller: _scrollController,
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                                itemCount:
+                                    filtered.length + (state.hasMore ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index == filtered.length) {
+                                    return const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 24),
+                                      child: Center(
+                                          child: CircularProgressIndicator()),
+                                    );
+                                  }
+                                  final item = filtered[index];
+                                  return _RequestTile(
+                                    item: item,
+                                    langCode: langCode,
+                                    onTap: () async {
+                                      await context.push(
+                                        '/requests/${widget.typeId}/${item.empReqMasterId}',
+                                        extra: item.requestId,
+                                      );
+                                      if (context.mounted) {
+                                        context
+                                            .read<RequestListCubit>()
+                                            .refresh();
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                    ),
+
+                    // ── Summary bar ────────────────────────────────────────
+                    _SummaryBar(
+                      totalCount: state.totalCount,
+                      loadedCount: allItems.length,
+                      pendingCount: pendingCount,
+                      approvedCount: approvedCount,
+                      rejectedCount: rejectedCount,
+                      l: l,
+                    ),
+                  ],
+                );
+              }
+
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ],
     );
   }
 }

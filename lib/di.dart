@@ -8,14 +8,18 @@ import 'core/network/dio_client.dart';
 class _ServiceLocator {
   late StorageService storage;
   late Dio dio;
+  late AuthInterceptor _authInterceptor;
   late AuthRemoteDataSource authDataSource;
   late RequestsRemoteDataSource requestsDataSource;
   bool _initialized = false;
 
+  set onUnauthorized(void Function()? cb) => _authInterceptor.onUnauthorized = cb;
+
   Future<void> init() async {
     if (_initialized) return;
     storage = await StorageService.create();
-    dio = DioClient.create(storage);
+    _authInterceptor = AuthInterceptor(storage);
+    dio = DioClient.create(storage, _authInterceptor);
     authDataSource = AuthRemoteDataSource(dio);
     requestsDataSource = RequestsRemoteDataSource(dio);
     _initialized = true;

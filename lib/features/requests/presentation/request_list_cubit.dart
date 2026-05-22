@@ -52,6 +52,7 @@ class RequestListCubit extends Cubit<RequestListState> {
           items: newItems,
           hasMore: _hasMore,
           totalCount: response.totalCount,
+          summary: response.summary,
         ));
       } else {
         final current = state as RequestListLoaded;
@@ -59,6 +60,7 @@ class RequestListCubit extends Cubit<RequestListState> {
           items: [...current.items, ...newItems],
           hasMore: _hasMore,
           totalCount: response.totalCount,
+          summary: response.summary,
         ));
       }
     } on ApiException catch (e) {

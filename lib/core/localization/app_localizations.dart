@@ -67,6 +67,7 @@ class AppLocalizations {
       'step_approved': 'Approved',
       'step_rejected': 'Rejected',
       'step_pending': 'Pending',
+      'request_number': 'Request No.',
     },
     'ar': {
       'app_title': 'طلبات الموارد البشرية',
@@ -125,6 +126,7 @@ class AppLocalizations {
       'step_approved': 'معتمد',
       'step_rejected': 'مرفوض',
       'step_pending': 'قيد الانتظار',
+      'request_number': 'رقم الطلب',
     },
   };
 
@@ -189,6 +191,7 @@ class AppLocalizations {
   String get stepApproved => get('step_approved');
   String get stepRejected => get('step_rejected');
   String get stepPending => get('step_pending');
+  String get requestNumber => get('request_number');
 }
 
 class AppLocalizationsDelegate

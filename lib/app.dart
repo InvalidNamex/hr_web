@@ -11,6 +11,7 @@ import 'features/requests/presentation/request_types_cubit.dart';
 import 'features/auth/data/auth_remote_datasource.dart';
 import 'features/requests/data/requests_remote_datasource.dart';
 import 'core/router/app_router.dart';
+import 'core/storage/storage_service.dart';
 import 'di.dart';
 
 class App extends StatefulWidget {
@@ -32,8 +33,11 @@ class _AppState extends State<App> {
       dataSource: getIt<AuthRemoteDataSource>(),
       storage: getIt(),
     );
+    getIt.onUnauthorized = () {
+      if (_authCubit.state is! AuthUnauthenticated) _authCubit.logout();
+    };
     _requestTypesCubit =
-        RequestTypesCubit(getIt<RequestsRemoteDataSource>());
+        RequestTypesCubit(getIt<RequestsRemoteDataSource>(), getIt<StorageService>());
 
     // Router created once — never recreated on theme/locale change
     _router = createRouter(_authCubit);

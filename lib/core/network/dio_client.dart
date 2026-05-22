@@ -6,6 +6,7 @@ class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._storage);
 
   final StorageService _storage;
+  void Function()? onUnauthorized;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -21,7 +22,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // 401 will be handled by AuthCubit watching the stream; just forward.
+    if (err.response?.statusCode == 401) {
+      onUnauthorized?.call();
+    }
     handler.next(err);
   }
 }
@@ -29,7 +32,7 @@ class AuthInterceptor extends Interceptor {
 class DioClient {
   DioClient._();
 
-  static Dio create(StorageService storage) {
+  static Dio create(StorageService storage, AuthInterceptor authInterceptor) {
     final dio = Dio(
       BaseOptions(
         baseUrl: AppConstants.baseUrl,
@@ -41,7 +44,7 @@ class DioClient {
       ),
     );
 
-    dio.interceptors.add(AuthInterceptor(storage));
+    dio.interceptors.add(authInterceptor);
     dio.interceptors.add(
       LogInterceptor(
         requestHeader: true,

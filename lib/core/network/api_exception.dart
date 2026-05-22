@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiException implements Exception {
   ApiException(this.message, {this.statusCode});
@@ -14,6 +15,12 @@ class ApiException implements Exception {
         return ApiException('Connection timed out. Please try again.');
       case DioExceptionType.connectionError:
         final cause = e.error?.toString() ?? '';
+        if (kIsWeb) {
+          return ApiException(
+            'Browser blocked the request (likely CORS/SSL). '
+            'For local web development, run: dart run tool/proxy_server.dart',
+          );
+        }
         if (cause.contains('CERTIFICATE') ||
             cause.contains('HandshakeException') ||
             cause.contains('tls') ||

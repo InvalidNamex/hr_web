@@ -8,9 +8,12 @@ class RequestsRemoteDataSource {
 
   final Dio _dio;
 
-  Future<List<RequestType>> getRequestTypes() async {
+  Future<List<RequestType>> getRequestTypes({required int userGroupId}) async {
     try {
-      final response = await _dio.get('/api/Web/GetRequestType');
+      final response = await _dio.get(
+        '/api/Web/GetRequestType',
+        queryParameters: {'usergroupid': userGroupId},
+      );
       final body = response.data;
       List<dynamic> list;
       if (body is Map<String, dynamic>) {

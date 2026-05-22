@@ -206,6 +206,11 @@ class _DetailBody extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (info.requestNumber != null)
+                        _InfoRow(
+                          label: l.requestNumber,
+                          value: '#${info.requestNumber}',
+                        ),
                       _InfoRow(
                         label: l.employee,
                         value: _loc(info.employeeName, info.employeeNameAr),
@@ -243,22 +248,43 @@ class _DetailBody extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: _InfoRow(
-                          label: l.fromDate,
-                          value: info.fromDate ?? '-',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(l.fromDate,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.outline)),
+                            Text(info.fromDate ?? '-',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600)),
+                          ],
                         ),
                       ),
                       Expanded(
-                        child: _InfoRow(
-                          label: l.toDate,
-                          value: info.toDate ?? '-',
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(l.toDate,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.outline)),
+                            Text(info.toDate ?? '-',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600)),
+                          ],
                         ),
                       ),
                       if (info.daysNum != null)
                         Expanded(
-                          child: _InfoRow(
-                            label: l.days,
-                            value: '${info.daysNum}',
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l.days,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context).colorScheme.outline)),
+                              Text('${info.daysNum}',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      fontWeight: FontWeight.w600)),
+                            ],
                           ),
                         ),
                     ],
@@ -422,6 +448,15 @@ class _ApprovalFlowCard extends StatelessWidget {
           approveState: null,
         ),
     ];
+
+    steps.sort((a, b) {
+      final dateA = a.detail.reqDate;
+      final dateB = b.detail.reqDate;
+      if (dateA == null && dateB == null) return 0;
+      if (dateA == null) return -1;
+      if (dateB == null) return 1;
+      return dateA.compareTo(dateB);
+    });
 
     if (steps.isEmpty) return const SizedBox.shrink();
 

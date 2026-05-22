@@ -19,14 +19,16 @@ class RequestListLoaded extends RequestListState {
     required this.items,
     required this.hasMore,
     required this.totalCount,
+    this.summary,
   });
 
   final List<RequestListItem> items;
   final bool hasMore;
   final int totalCount;
+  final RequestSummary? summary;
 
   @override
-  List<Object?> get props => [items, hasMore, totalCount];
+  List<Object?> get props => [items, hasMore, totalCount, summary];
 }
 
 class RequestListError extends RequestListState {

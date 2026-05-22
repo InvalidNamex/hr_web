@@ -98,7 +98,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             name: type.localizedName(langCode),
                             index: index,
                             onTap: () =>
-                                context.go('/requests/${type.id}'),
+                                context.push('/requests/${type.id}'),
                           );
                         },
                         childCount: state.types.length,

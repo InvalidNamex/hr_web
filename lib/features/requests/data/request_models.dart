@@ -158,14 +158,39 @@ class RequestListItem extends Equatable {
   List<Object?> get props => [empReqMasterId, requestId];
 }
 
+class RequestSummary {
+  const RequestSummary({
+    this.pendingCount = 0,
+    this.approvedCount = 0,
+    this.rejectedCount = 0,
+    this.cancelledCount = 0,
+  });
+
+  final int pendingCount;
+  final int approvedCount;
+  final int rejectedCount;
+  final int cancelledCount;
+
+  factory RequestSummary.fromJson(Map<String, dynamic> json) {
+    return RequestSummary(
+      pendingCount:   (json['PendingCount']   ?? json['pendingCount']   ?? 0) as int,
+      approvedCount:  (json['ApprovedCount']  ?? json['approvedCount']  ?? 0) as int,
+      rejectedCount:  (json['RejectedCount']  ?? json['rejectedCount']  ?? 0) as int,
+      cancelledCount: (json['CancelledCount'] ?? json['cancelledCount'] ?? 0) as int,
+    );
+  }
+}
+
 class RequestListResponse {
   const RequestListResponse({
     required this.items,
     required this.totalCount,
+    this.summary,
   });
 
   final List<RequestListItem> items;
   final int totalCount;
+  final RequestSummary? summary;
 
   factory RequestListResponse.fromJson(Map<String, dynamic> json) {
     final data = json['data'];
@@ -183,11 +208,17 @@ class RequestListResponse {
             json['TotalCount'] ??
             rawItems.length) as int;
 
+    final rawSummary = json['body'];
+    final summary = rawSummary is Map<String, dynamic>
+        ? RequestSummary.fromJson(rawSummary)
+        : null;
+
     return RequestListResponse(
       items: rawItems
           .map((e) => RequestListItem.fromJson(e as Map<String, dynamic>))
           .toList(),
       totalCount: total,
+      summary: summary,
     );
   }
 }
