@@ -181,8 +181,8 @@ class _DetailBody extends StatelessWidget {
     final isActing = executeState is ExecuteVacationLoading;
 
     // 0 = pending (can execute), 1 = approved (can undo), 2 = rejected
-    final canExecute = info.requestStatus == 0 && !info.isCancelled;
-    final canUndo    = info.requestStatus == 1 && !info.isCancelled;
+    final canExecute = !info.isExecuted && !info.isCancelled;
+    final canUndo    = info.isExecuted  && !info.isCancelled;
 
     // Chips for boolean options that are true
     final chips = <String>[

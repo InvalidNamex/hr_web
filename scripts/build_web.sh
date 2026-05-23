@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
-# Build Flutter Web with WebAssembly and deploy to Vercel.
+# Build Flutter Web with WebAssembly and prepare for Vercel deployment.
 # Usage:
 #   ./scripts/build_web.sh [API_BASE_URL]
 #
@@ -11,7 +11,9 @@ set -euo pipefail
 #                 Defaults to https://natureccmpany.homeip.net:57571
 # ---------------------------------------------------------------------------
 
-API_URL="${1:-https://natureccmpany.homeip.net:57571}"
+API_URL="${1:-/api-proxy}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 echo "Building Flutter Web (WASM) ..."
 echo "  API_BASE_URL = $API_URL"
@@ -22,8 +24,13 @@ flutter build web \
   --release \
   --dart-define=API_BASE_URL="$API_URL"
 
+# Copy Vercel routing config into the build output so you can deploy
+# directly from build/web with: cd build/web && vercel --prod
+cp "$ROOT_DIR/vercel.json" "$ROOT_DIR/build/web/vercel.json"
+
 echo ""
 echo "Build complete → build/web/"
 echo ""
 echo "Deploy to Vercel:"
+echo "  cd build/web"
 echo "  vercel --prod"

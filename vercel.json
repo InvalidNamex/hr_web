@@ -1,7 +1,6 @@
 {
   "version": 2,
   "framework": null,
-  "outputDirectory": "build/web",
   "headers": [
     {
       "source": "/(.*)",
@@ -12,6 +11,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/api-proxy/:path*", "destination": "https://natureccmpany.homeip.net:57571/:path*" },
     { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
   ]
 }

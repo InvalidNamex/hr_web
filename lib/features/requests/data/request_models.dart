@@ -346,6 +346,7 @@ class RequestInfo extends Equatable {
     this.reqTypeId = 0,
     this.processedReqName,
     this.requestStatus = 0,
+    this.isExecuted = false,
     this.stepNo = 0,
     this.isProcessed = false,
     this.isCompleted = false,
@@ -395,6 +396,7 @@ class RequestInfo extends Equatable {
   final int reqTypeId;
   final String? processedReqName;
   final int requestStatus;
+  final bool isExecuted;
   final int stepNo;
   final bool isProcessed;
   final bool isCompleted;
@@ -459,6 +461,7 @@ class RequestInfo extends Equatable {
       reqTypeId:            (data['reqTypeId'] as int?) ?? 0,
       processedReqName:     _nonEmpty(data['processedReqName']),
       requestStatus:        (data['requestStatus'] as int?) ?? 0,
+      isExecuted:           (data['isExecuted'] as bool?) ?? false,
       stepNo:               (data['stepNo'] as int?) ?? 0,
       isProcessed:          (data['isProcessed'] as bool?) ?? false,
       isCompleted:          (data['isCompleted'] as bool?) ?? false,
