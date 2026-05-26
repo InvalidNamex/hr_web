@@ -179,6 +179,7 @@ class _DetailBody extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final executeState = context.watch<ExecuteVacationCubit>().state;
     final isActing = executeState is ExecuteVacationLoading;
+    final localizedReason = info.localizedReason(langCode);
 
     // 0 = pending (can execute), 1 = approved (can undo), 2 = rejected
     final canExecute = !info.isExecuted && !info.isCancelled;
@@ -342,10 +343,22 @@ class _DetailBody extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _InfoRow(
-                        label: l.status,
-                        value: info.localizedStatus(langCode),
-                        valueColor: Theme.of(context).colorScheme.primary,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 130,
+                              child: Text(
+                                l.status,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Theme.of(context).colorScheme.outline),
+                              ),
+                            ),
+                            _RequestFullStatusBadge(info: info),
+                          ],
+                        ),
                       ),
                       if (info.declineReason != null)
                         _InfoRow(
@@ -353,8 +366,8 @@ class _DetailBody extends StatelessWidget {
                           value: info.declineReason!,
                           valueColor: Theme.of(context).colorScheme.error,
                         ),
-                      if (info.vacReason != null)
-                        _InfoRow(label: l.reason, value: info.vacReason!),
+                      if (localizedReason.isNotEmpty)
+                        _InfoRow(label: l.reason, value: localizedReason),
                     ],
                   ),
                 ),
@@ -650,6 +663,78 @@ class _FlowStepTile extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Request Full Status Badge ─────────────────────────────────────────────────
+
+class _RequestFullStatusBadge extends StatelessWidget {
+  const _RequestFullStatusBadge({required this.info});
+
+  final RequestInfo info;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final status = info.fullStatus;
+
+    final (label, color) = switch (status) {
+      RequestFullStatus.acceptedNotStarted => (
+        l.statusApprovedNotStarted,
+        const Color(0xFF2D9D5F),
+      ),
+      RequestFullStatus.acceptedJustStarted => (
+        l.statusApprovedActive,
+        const Color(0xFF2D9D5F),
+      ),
+      RequestFullStatus.lastVacationDay => (
+        l.statusLastVacationDay,
+        const Color(0xFF2D9D5F),
+      ),
+      RequestFullStatus.finishedResumed => (
+        l.statusFinishedResumed,
+        const Color(0xFF2D9D5F),
+      ),
+      RequestFullStatus.finishedNeedsResume => (
+        '${l.statusFinishedNeedsResume} ${info.resumeWorkDate ?? ''}',
+        const Color(0xFF795548),
+      ),
+      RequestFullStatus.rejected => (
+        l.statusRejected,
+        Theme.of(context).colorScheme.error,
+      ),
+      RequestFullStatus.expired => (
+        l.statusExpired,
+        Theme.of(context).colorScheme.error,
+      ),
+      RequestFullStatus.cancelled => (
+        l.statusCancelled,
+        Theme.of(context).colorScheme.error,
+      ),
+      RequestFullStatus.pending => (
+        l.statusPending,
+        Theme.of(context).colorScheme.outline,
+      ),
+      RequestFullStatus.unknown => (
+        l.statusUnknown,
+        Theme.of(context).colorScheme.outline,
+      ),
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
       ),
     );
   }

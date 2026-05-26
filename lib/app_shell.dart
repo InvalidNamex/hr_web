@@ -104,31 +104,38 @@ class _DrawerContent extends StatelessWidget {
                 ],
               ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                onNav('/');
+                context.go('/');
+              },
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Image.asset(
+                      'assets/logo.png',
+                      height: 36,
+                      width: 36,
+                    ),
                   ),
-                  child: Image.asset(
-                    'assets/logo.png',
-                    height: 36,
-                    width: 36,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      l.appTitle,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    l.appTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(

@@ -1,6 +1,29 @@
 import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
+enum RequestFullStatus {
+  /// Approved but vacation has not started yet.
+  acceptedNotStarted,
+  /// Approved and vacation is currently active.
+  acceptedJustStarted,
+  /// Submitted, awaiting decision.
+  pending,
+  /// Vacation ended; employee must return on a specific resume date.
+  finishedNeedsResume,
+  /// Vacation ended; employee has already resumed work (or no resume date set).
+  finishedResumed,
+  /// Request rejected.
+  rejected,
+  /// Request auto-rejected because it expired before completion.
+  expired,
+  /// Request cancelled.
+  cancelled,
+  /// Today is the last day of the vacation.
+  lastVacationDay,
+  /// No additional data available.
+  unknown,
+}
+
 class RequestType extends Equatable {
   const RequestType({
     required this.id,
@@ -46,6 +69,9 @@ class RequestListItem extends Equatable {
   const RequestListItem({
     required this.empReqMasterId,
     required this.requestId,
+    this.requestNumber,
+    this.requestSummary,
+    this.requestSummaryAr,
     this.employeeName,
     this.employeeNameAr,
     this.requestTypeName,
@@ -53,11 +79,15 @@ class RequestListItem extends Equatable {
     this.requestDate,
     this.status,
     this.statusAr,
+    this.additionalData,
     this.raw = const {},
   });
 
   final int empReqMasterId;
   final int requestId;
+  final int? requestNumber;
+  final String? requestSummary;
+  final String? requestSummaryAr;
   final String? employeeName;
   final String? employeeNameAr;
   final String? requestTypeName;
@@ -65,9 +95,16 @@ class RequestListItem extends Equatable {
   final String? requestDate;
   final String? status;
   final String? statusAr;
+  final RequestAdditionalData? additionalData;
   final Map<String, dynamic> raw;
 
   factory RequestListItem.fromJson(Map<String, dynamic> json) {
+    int? _parseInt(dynamic value) {
+      if (value == null) return null;
+      if (value is int) return value;
+      return int.tryParse('$value');
+    }
+
     // Parse UserName: may be JSON string {"en":"...","ar":"..."}
     final rawUserName =
         (json['UserName'] ?? json['userName'] ?? json['employeeName'] ?? '') as String;
@@ -104,6 +141,8 @@ class RequestListItem extends Equatable {
             json['EmpReqMasterID'] ??
             json['empReqMasterId'] ??
             0) as int;
+    final reqSummary =
+      _decodeLocalized(json['requestSummary'] ?? json['RequestSummary']);
 
     return RequestListItem(
       empReqMasterId: masterId,
@@ -112,6 +151,15 @@ class RequestListItem extends Equatable {
               json['requestID'] ??
               json['RequestID'] ??
               masterId) as int,
+      requestNumber: _parseInt(
+        json['requestNumber'] ??
+            json['RequestNumber'] ??
+            json['ReqNumber'] ??
+            json['ReqNo'] ??
+            json['RequestNo'],
+      ),
+      requestSummary: reqSummary.en.isEmpty ? null : reqSummary.en,
+      requestSummaryAr: reqSummary.ar,
       employeeName: employeeName.isEmpty ? null : employeeName,
       employeeNameAr: employeeNameAr,
       requestTypeName: requestTypeName.isEmpty ? null : requestTypeName,
@@ -119,6 +167,13 @@ class RequestListItem extends Equatable {
       requestDate: json['ReqDate'] as String? ?? json['requestDate'] as String?,
       status: _statusLabel(statusInt),
       statusAr: _statusLabelAr(statusInt),
+      additionalData: (() {
+        final raw = json['AdditionalData'] ?? json['additionalData'];
+        if (raw is List && raw.isNotEmpty) {
+          return RequestAdditionalData.fromJson(raw.first as Map<String, dynamic>);
+        }
+        return null;
+      })(),
       raw: Map<String, dynamic>.from(json),
     );
   }
@@ -151,8 +206,38 @@ class RequestListItem extends Equatable {
           ? requestTypeNameAr!
           : (requestTypeName ?? '');
 
+    String localizedSummary(String langCode) =>
+      langCode == 'ar' && requestSummaryAr != null
+        ? requestSummaryAr!
+        : (requestSummary ?? '');
+
   String localizedStatus(String langCode) =>
       langCode == 'ar' && statusAr != null ? statusAr! : (status ?? '');
+
+  RequestFullStatus get fullStatus {
+    final addl = additionalData;
+    if (addl == null) return RequestFullStatus.unknown;
+    final statusInt = (() {
+      final s = raw['RequestStatus'];
+      return s is int ? s : int.tryParse('$s') ?? 0;
+    })();
+    if (statusInt == 2) {
+      return addl.isExpired ? RequestFullStatus.expired : RequestFullStatus.rejected;
+    }
+    if (addl.isCancelled) return RequestFullStatus.cancelled;
+    if (addl.vacationEnded) {
+      if (addl.shouldResumeWork) {
+        return addl.resumeWorkDate != null
+            ? RequestFullStatus.finishedNeedsResume
+            : RequestFullStatus.finishedResumed;
+      }
+      return RequestFullStatus.finishedResumed;
+    }
+    if (addl.isLastVacationDay) return RequestFullStatus.lastVacationDay;
+    if (addl.isVacationActive) return RequestFullStatus.acceptedJustStarted;
+    if (addl.isCompleted) return RequestFullStatus.acceptedNotStarted;
+    return RequestFullStatus.pending;
+  }
 
   @override
   List<Object?> get props => [empReqMasterId, requestId];
@@ -223,16 +308,50 @@ class RequestListResponse {
   }
 }
 
-// Helper: decode JSON-encoded localized string {"en":"...","ar":"..."}
+// Helper: decode localized data from object/list or JSON-encoded string.
 ({String en, String? ar}) _decodeLocalized(dynamic raw) {
   if (raw == null) return (en: '', ar: null);
-  final s = raw as String;
-  if (s.trim().startsWith('{')) {
-    try {
-      final m = jsonDecode(s) as Map<String, dynamic>;
-      return (en: m['en'] as String? ?? s, ar: m['ar'] as String?);
-    } catch (_) {}
+
+  ({String en, String? ar}) fromMap(Map<String, dynamic> m) {
+    final en = (m['en'] ?? m['En'] ?? m['EN'] ?? '').toString();
+    final arRaw = m['ar'] ?? m['Ar'] ?? m['AR'];
+    final ar = arRaw == null ? null : arRaw.toString();
+    return (en: en, ar: ar);
   }
+
+  if (raw is Map<String, dynamic>) {
+    return fromMap(raw);
+  }
+
+  if (raw is List && raw.isNotEmpty) {
+    final first = raw.first;
+    if (first is Map<String, dynamic>) {
+      return fromMap(first);
+    }
+  }
+
+  final s = raw.toString();
+  final trimmed = s.trim();
+
+  try {
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      final decoded = jsonDecode(trimmed);
+      if (decoded is Map<String, dynamic>) {
+        final loc = fromMap(decoded);
+        if (loc.en.isNotEmpty || (loc.ar?.isNotEmpty ?? false)) return loc;
+      }
+      if (decoded is List && decoded.isNotEmpty) {
+        final first = decoded.first;
+        if (first is Map<String, dynamic>) {
+          final loc = fromMap(first);
+          if (loc.en.isNotEmpty || (loc.ar?.isNotEmpty ?? false)) return loc;
+        }
+      }
+    }
+  } catch (_) {
+    // Fallback to raw string when payload is not JSON.
+  }
+
   return (en: s, ar: null);
 }
 
@@ -310,6 +429,43 @@ class RequestUserDetails extends Equatable {
       [initiatorDetails, requestWorkFlowDetails, subRequests, resumeWorkDetails];
 }
 
+/// Parsed representation of a single entry in the API's [AdditionalData] array,
+/// present on both list and detail responses.
+class RequestAdditionalData {
+  const RequestAdditionalData({
+    this.isCompleted = false,
+    this.shouldResumeWork = false,
+    this.vacationEnded = false,
+    this.isVacationActive = false,
+    this.isLastVacationDay = false,
+    this.isCancelled = false,
+    this.isExpired = false,
+    this.resumeWorkDate,
+  });
+
+  final bool isCompleted;
+  final bool shouldResumeWork;
+  final bool vacationEnded;
+  final bool isVacationActive;
+  final bool isLastVacationDay;
+  final bool isCancelled;
+  final bool isExpired;
+  final String? resumeWorkDate;
+
+  factory RequestAdditionalData.fromJson(Map<String, dynamic> json) {
+    return RequestAdditionalData(
+      isCompleted:       (json['IsCompleted']       ?? json['isCompleted']       ?? false) as bool,
+      shouldResumeWork:  (json['ShouldResumeWork']  ?? json['shouldResumeWork']  ?? false) as bool,
+      vacationEnded:     (json['VacationEnded']     ?? json['vacationEnded']     ?? false) as bool,
+      isVacationActive:  (json['IsVacationActive']  ?? json['isVacationActive']  ?? false) as bool,
+      isLastVacationDay: (json['IsLastVacationDay'] ?? json['isLastVacationDay'] ?? false) as bool,
+      isCancelled:       (json['IsCancelled']       ?? json['isCancelled']       ?? false) as bool,
+      isExpired:         (json['IsExpired']         ?? json['isExpired']         ?? false) as bool,
+      resumeWorkDate:    json['ResumeWorkDate'] as String? ?? json['resumeWorkDate'] as String?,
+    );
+  }
+}
+
 class RequestInfo extends Equatable {
   const RequestInfo({
     required this.empReqMasterId,
@@ -337,6 +493,8 @@ class RequestInfo extends Equatable {
     this.ticket = false,
     this.exitRentry = false,
     this.tickAttach,
+    this.requestSummary,
+    this.requestSummaryAr,
     this.vacReason,
     this.attachPath,
     this.declineReason,
@@ -355,6 +513,10 @@ class RequestInfo extends Equatable {
     this.hasActiveSubRequest = false,
     this.shouldResumeWork = false,
     this.isVacationEnded = false,
+    this.isExpired = false,
+    this.isLastVacationDay = false,
+    this.isVacationActive = false,
+    this.resumeWorkDate,
     this.visaDate,
     this.exitRentryCostTypeId = 0,
     this.exitRentryCostTypeName,
@@ -387,6 +549,8 @@ class RequestInfo extends Equatable {
   final bool ticket;
   final bool exitRentry;
   final String? tickAttach;
+  final String? requestSummary;
+  final String? requestSummaryAr;
   final String? vacReason;
   final String? attachPath;
   final String? declineReason;
@@ -405,6 +569,10 @@ class RequestInfo extends Equatable {
   final bool hasActiveSubRequest;
   final bool shouldResumeWork;
   final bool isVacationEnded;
+  final bool isExpired;
+  final bool isLastVacationDay;
+  final bool isVacationActive;
+  final String? resumeWorkDate;
   final String? visaDate;
   final int exitRentryCostTypeId;
   final String? exitRentryCostTypeName;
@@ -420,11 +588,21 @@ class RequestInfo extends Equatable {
     final alterName  = _decodeLocalized(data['alterEmpName']);
     final exitType   = _decodeLocalized(data['exitRentryTypeName']);
     final vacType    = _decodeLocalized(data['vacTypeName']);
+    final reqSummary =
+      _decodeLocalized(data['requestSummary'] ?? data['RequestSummary']);
 
     final rawUserDetails = data['requestUserDetails'];
     final userDetails = rawUserDetails is Map<String, dynamic>
         ? RequestUserDetails.fromJson(rawUserDetails)
         : null;
+
+    // Parse AdditionalData array; take the first element for field overrides.
+    final rawAddl = data['AdditionalData'] ?? data['additionalData'];
+    final Map<String, dynamic>? addlData = rawAddl is List && rawAddl.isNotEmpty
+        ? rawAddl.first as Map<String, dynamic>?
+        : rawAddl is Map<String, dynamic> ? rawAddl : null;
+    bool _addlBool(String addlKey, String fallback) =>
+        (addlData?[addlKey] ?? data[fallback] ?? false) as bool;
 
     return RequestInfo(
       empReqMasterId: (data['empReqMasterID'] ?? data['empReqMasterId'] ?? 0) as int,
@@ -452,6 +630,8 @@ class RequestInfo extends Equatable {
       ticket:               (data['ticket'] as bool?) ?? false,
       exitRentry:           (data['exitRentry'] as bool?) ?? false,
       tickAttach:           _nonEmpty(data['tickAttach']),
+      requestSummary:       _nonEmpty(reqSummary.en),
+      requestSummaryAr:     _nonEmpty(reqSummary.ar),
       vacReason:            _nonEmpty(data['vacReason']),
       attachPath:           _nonEmpty(data['attachPath']),
       declineReason:        _nonEmpty(data['declineReason']),
@@ -464,12 +644,16 @@ class RequestInfo extends Equatable {
       isExecuted:           (data['isExecuted'] as bool?) ?? false,
       stepNo:               (data['stepNo'] as int?) ?? 0,
       isProcessed:          (data['isProcessed'] as bool?) ?? false,
-      isCompleted:          (data['isCompleted'] as bool?) ?? false,
-      isCancelled:          (data['isCancelled'] as bool?) ?? false,
+      isCompleted:          _addlBool('IsCompleted',       'isCompleted'),
+      isCancelled:          _addlBool('IsCancelled',        'isCancelled'),
       subRequestExists:     (data['subRequestExists'] as bool?) ?? false,
       hasActiveSubRequest:  (data['hasActiveSubRequest'] as bool?) ?? false,
-      shouldResumeWork:     (data['shouldResumeWork'] as bool?) ?? false,
-      isVacationEnded:      (data['isVacationEnded'] as bool?) ?? false,
+      shouldResumeWork:     _addlBool('ShouldResumeWork',  'shouldResumeWork'),
+      isVacationEnded:      _addlBool('VacationEnded',     'isVacationEnded'),
+      isExpired:            _addlBool('IsExpired',         'isExpired'),
+      isLastVacationDay:    _addlBool('IsLastVacationDay', 'isLastVacationDay'),
+      isVacationActive:     _addlBool('IsVacationActive',  'isVacationActive'),
+      resumeWorkDate:       addlData?['ResumeWorkDate'] as String? ?? data['resumeWorkDate'] as String?,
       visaDate:             _nonEmpty(data['visaDate']),
       exitRentryCostTypeId: (data['exitRentryCostTypeId'] as int?) ?? 0,
       exitRentryCostTypeName: data['exitRentryCostTypeName'] as String?,
@@ -490,10 +674,37 @@ class RequestInfo extends Equatable {
   String localizedRequestType(String langCode) =>
       langCode == 'ar' && requestTypeNameAr != null ? requestTypeNameAr! : (requestTypeName ?? '');
 
+  String localizedReason(String langCode) {
+    final summary =
+        langCode == 'ar' ? (requestSummaryAr ?? requestSummary) : requestSummary;
+    if (summary != null && summary.isNotEmpty) return summary;
+    return vacReason ?? '';
+  }
+
   String get statusLabel => RequestListItem._statusLabel(requestStatus);
   String get statusLabelAr => RequestListItem._statusLabelAr(requestStatus);
   String localizedStatus(String langCode) =>
       langCode == 'ar' ? statusLabelAr : statusLabel;
+
+  /// Resolves the granular [RequestFullStatus] using all available fields.
+  RequestFullStatus get fullStatus {
+    if (requestStatus == 2) {
+      return isExpired ? RequestFullStatus.expired : RequestFullStatus.rejected;
+    }
+    if (isCancelled) return RequestFullStatus.cancelled;
+    if (isVacationEnded) {
+      if (shouldResumeWork) {
+        return resumeWorkDate != null
+            ? RequestFullStatus.finishedNeedsResume
+            : RequestFullStatus.finishedResumed;
+      }
+      return RequestFullStatus.finishedResumed;
+    }
+    if (isLastVacationDay) return RequestFullStatus.lastVacationDay;
+    if (isVacationActive) return RequestFullStatus.acceptedJustStarted;
+    if (isCompleted) return RequestFullStatus.acceptedNotStarted;
+    return RequestFullStatus.pending;
+  }
 
   @override
   List<Object?> get props => [empReqMasterId, vacReqDetailId];

@@ -463,9 +463,11 @@ class _RequestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final date = item.requestDate != null && item.requestDate!.length > 10
         ? item.requestDate!.substring(0, 10)
         : item.requestDate;
+    final localizedSummary = item.localizedSummary(langCode);
 
     return Card(
       elevation: 0,
@@ -495,7 +497,7 @@ class _RequestTile extends StatelessWidget {
                   width: 6,
                   height: 60,
                   decoration: BoxDecoration(
-                    color: _statusColor(context, item.status ?? ''),
+                    color: _fullStatusColor(context, item.fullStatus),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -504,6 +506,16 @@ class _RequestTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (item.requestNumber != null) ...[
+                        Text(
+                          '${l.requestNumber}: #${item.requestNumber}',
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        const SizedBox(height: 4),
+                      ],
                       Text(
                         item.localizedEmployeeName(langCode),
                         style: Theme.of(context)
@@ -519,10 +531,19 @@ class _RequestTile extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.outline,
                               ),
                         ),
+                      if (localizedSummary.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          localizedSummary,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          if (date != null) ...[  
+                          if (date != null) ...[
                             Icon(Icons.calendar_today_outlined,
                                 size: 14,
                                 color: Theme.of(context).colorScheme.outline),
@@ -531,26 +552,7 @@ class _RequestTile extends StatelessWidget {
                                 style: Theme.of(context).textTheme.bodySmall),
                             const SizedBox(width: 16),
                           ],
-                          if (item.status != null && item.status!.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: _statusColor(context, item.status ?? '').withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                item.localizedStatus(langCode),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      color:
-                                          _statusColor(context, item.status ?? ''),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 11,
-                                    ),
-                              ),
-                            ),
+                          _ListStatusBadge(item: item, langCode: langCode),
                         ],
                       ),
                     ],
@@ -684,5 +686,92 @@ Color _statusColor(BuildContext context, String status) {
     case 'قيد الانتظار':
     default:
       return Theme.of(context).colorScheme.primary;
+  }
+}
+
+Color _fullStatusColor(BuildContext context, RequestFullStatus status) {
+  switch (status) {
+    case RequestFullStatus.acceptedNotStarted:
+    case RequestFullStatus.acceptedJustStarted:
+    case RequestFullStatus.lastVacationDay:
+    case RequestFullStatus.finishedResumed:
+      return const Color(0xFF2D9D5F);
+    case RequestFullStatus.finishedNeedsResume:
+      return const Color(0xFF795548);
+    case RequestFullStatus.rejected:
+    case RequestFullStatus.expired:
+    case RequestFullStatus.cancelled:
+      return Theme.of(context).colorScheme.error;
+    case RequestFullStatus.pending:
+    case RequestFullStatus.unknown:
+      return Theme.of(context).colorScheme.primary;
+  }
+}
+
+class _ListStatusBadge extends StatelessWidget {
+  const _ListStatusBadge({required this.item, required this.langCode});
+
+  final RequestListItem item;
+  final String langCode;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final status = item.fullStatus;
+    if (status == RequestFullStatus.unknown) {
+      final color = _statusColor(context, item.status ?? '');
+      return _badge(context, item.localizedStatus(langCode), color);
+    }
+    final color = _fullStatusColor(context, status);
+    final label = _resolveLabel(l, status, item);
+    return _badge(context, label, color);
+  }
+
+  Widget _badge(BuildContext context, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+              fontSize: 11,
+            ),
+      ),
+    );
+  }
+
+  String _resolveLabel(
+    AppLocalizations l,
+    RequestFullStatus status,
+    RequestListItem item,
+  ) {
+    switch (status) {
+      case RequestFullStatus.acceptedNotStarted:
+        return l.statusApprovedNotStarted;
+      case RequestFullStatus.acceptedJustStarted:
+        return l.statusApprovedActive;
+      case RequestFullStatus.lastVacationDay:
+        return l.statusLastVacationDay;
+      case RequestFullStatus.finishedResumed:
+        return l.statusFinishedResumed;
+      case RequestFullStatus.finishedNeedsResume:
+        final date = item.additionalData?.resumeWorkDate ?? '';
+        return '${l.statusFinishedNeedsResume} $date'.trim();
+      case RequestFullStatus.rejected:
+        return l.statusRejected;
+      case RequestFullStatus.expired:
+        return l.statusExpired;
+      case RequestFullStatus.cancelled:
+        return l.statusCancelled;
+      case RequestFullStatus.pending:
+        return l.statusPending;
+      case RequestFullStatus.unknown:
+        return l.statusUnknown;
+    }
   }
 }

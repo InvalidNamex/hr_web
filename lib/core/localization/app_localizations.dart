@@ -68,6 +68,14 @@ class AppLocalizations {
       'step_rejected': 'Rejected',
       'step_pending': 'Pending',
       'request_number': 'Request No.',
+      'status_approved_not_started': 'Approved \u2013 Not Started',
+      'status_approved_active': 'Approved \u2013 Active',
+      'status_finished_needs_resume': 'Finished \u2013 Resume by',
+      'status_finished_resumed': 'Finished \u2013 Resumed',
+      'status_cancelled': 'Cancelled',
+      'status_expired': 'Expired',
+      'status_last_vacation_day': 'Last Vacation Day',
+      'status_unknown': 'Unknown',
     },
     'ar': {
       'app_title': 'طلبات الموارد البشرية',
@@ -127,6 +135,14 @@ class AppLocalizations {
       'step_rejected': 'مرفوض',
       'step_pending': 'قيد الانتظار',
       'request_number': 'رقم الطلب',
+      'status_approved_not_started': 'معتمد \u2013 لم يبدأ',
+      'status_approved_active': 'معتمد \u2013 جارٍ',
+      'status_finished_needs_resume': 'منتهية \u2013 الاستئناف بتاريخ',
+      'status_finished_resumed': 'منتهية \u2013 تم الاستئناف',
+      'status_cancelled': 'ملغي',
+      'status_expired': 'منتهية الصلاحية',
+      'status_last_vacation_day': 'آخر يوم إجازة',
+      'status_unknown': 'غير معروف',
     },
   };
 
@@ -192,6 +208,14 @@ class AppLocalizations {
   String get stepRejected => get('step_rejected');
   String get stepPending => get('step_pending');
   String get requestNumber => get('request_number');
+  String get statusApprovedNotStarted => get('status_approved_not_started');
+  String get statusApprovedActive => get('status_approved_active');
+  String get statusFinishedNeedsResume => get('status_finished_needs_resume');
+  String get statusFinishedResumed => get('status_finished_resumed');
+  String get statusCancelled => get('status_cancelled');
+  String get statusExpired => get('status_expired');
+  String get statusLastVacationDay => get('status_last_vacation_day');
+  String get statusUnknown => get('status_unknown');
 }
 
 class AppLocalizationsDelegate

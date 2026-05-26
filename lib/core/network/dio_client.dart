@@ -45,17 +45,6 @@ class DioClient {
     );
 
     dio.interceptors.add(authInterceptor);
-    dio.interceptors.add(
-      LogInterceptor(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: false,
-        responseBody: true,
-        error: true,
-        logPrint: (o) => print('[DIO] $o'),
-      ),
-    );
-
     return dio;
   }
 }
