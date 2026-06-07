@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 class AppConstants {
   AppConstants._();
 
-  static const String _localProxyUrl = 'http://localhost:8080';
+  // static const String _localProxyUrl = 'http://localhost:8080';
+  // static const String _remoteUrl = 'https://192.168.100.203';
   static const String _remoteUrl = 'https://natureccmpany.homeip.net:57571';
 
   /// Optional override with `--dart-define=API_BASE_URL=...`.
@@ -17,9 +18,9 @@ class AppConstants {
       return definedBaseUrl;
     }
 
-    if (kIsWeb && !kReleaseMode && _isLocalHost(Uri.base.host)) {
-      return _localProxyUrl;
-    }
+    // if (kIsWeb && !kReleaseMode && _isLocalHost(Uri.base.host)) {
+    //   return _localProxyUrl;
+    // }
 
     return _remoteUrl;
   }
