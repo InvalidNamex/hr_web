@@ -46,7 +46,8 @@ class RequestsRemoteDataSource {
         },
       );
       return RequestListResponse.fromJson(
-          response.data as Map<String, dynamic>);
+        response.data as Map<String, dynamic>,
+      );
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     }
@@ -67,6 +68,71 @@ class RequestsRemoteDataSource {
         },
       );
       return RequestInfo.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<List<WorkflowListItem>> getWorkflows() async {
+    try {
+      final response = await _dio.get('/api/Web/GetWorkflows');
+      final body = response.data;
+      List<dynamic> list;
+      if (body is Map<String, dynamic>) {
+        list = (body['data'] ?? body['Data'] ?? []) as List;
+      } else if (body is List) {
+        list = body;
+      } else {
+        list = [];
+      }
+
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(WorkflowListItem.fromJson)
+          .toList();
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<WorkflowDetails> getWorkflowById({required int id}) async {
+    try {
+      final response = await _dio.get(
+        '/api/Web/GetWorkflowById',
+        queryParameters: {'id': id},
+      );
+
+      return WorkflowDetails.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<WorkflowDropdowns> getWorkflowDropdowns({
+    required int userGroupId,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/api/Web/GetWorkflowDropdowns',
+        queryParameters: {'userGroupId': userGroupId},
+      );
+      return WorkflowDropdowns.fromJson(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<void> saveWorkflow(SaveWorkflowRequest request) async {
+    try {
+      await _dio.post('/api/Web/SaveWorkflow', data: request.toJson());
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
+  }
+
+  Future<void> updateWorkflow(UpdateWorkflowRequest request) async {
+    try {
+      await _dio.put('/api/Web/UpdateWorkflow', data: request.toJson());
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     }

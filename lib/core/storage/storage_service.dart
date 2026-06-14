@@ -25,14 +25,21 @@ class StorageService {
       _prefs.setString(AppConstants.hrGroupIdKey, id);
   Future<void> clearHrGroupId() => _prefs.remove(AppConstants.hrGroupIdKey);
 
+  // ── Employee ID ────────────────────────────────────────────────────────────
+  int getEmpId() => _prefs.getInt(AppConstants.empIdKey) ?? 0;
+  Future<void> saveEmpId(int id) => _prefs.setInt(AppConstants.empIdKey, id);
+  Future<void> clearEmpId() => _prefs.remove(AppConstants.empIdKey);
+
   // ── Theme ──────────────────────────────────────────────────────────────────
   ThemeMode getThemeMode() {
     final value = _prefs.getString(AppConstants.themeKey);
     return value == 'dark' ? ThemeMode.dark : ThemeMode.light;
   }
 
-  Future<void> saveThemeMode(ThemeMode mode) =>
-      _prefs.setString(AppConstants.themeKey, mode == ThemeMode.dark ? 'dark' : 'light');
+  Future<void> saveThemeMode(ThemeMode mode) => _prefs.setString(
+    AppConstants.themeKey,
+    mode == ThemeMode.dark ? 'dark' : 'light',
+  );
 
   // ── Locale ─────────────────────────────────────────────────────────────────
   Locale getLocale() {

@@ -33,6 +33,7 @@ class AppConstants {
   static const String serviceKey = '1111111';
   static const String tokenKey = 'jwt_token';
   static const String hrGroupIdKey = 'hr_group_id';
+  static const String empIdKey = 'emp_id';
   static const String themeKey = 'theme_mode';
   static const String localeKey = 'locale_lang';
 

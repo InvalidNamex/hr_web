@@ -11,9 +11,9 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit({
     required AuthRemoteDataSource dataSource,
     required StorageService storage,
-  })  : _dataSource = dataSource,
-        _storage = storage,
-        super(const AuthInitial());
+  }) : _dataSource = dataSource,
+       _storage = storage,
+       super(const AuthInitial());
 
   final AuthRemoteDataSource _dataSource;
   final StorageService _storage;
@@ -34,6 +34,7 @@ class AuthCubit extends Cubit<AuthState> {
       );
       await _storage.saveToken(response.token);
       await _storage.saveHrGroupId(response.hrGroupId);
+      await _storage.saveEmpId(response.empId);
       emit(const AuthAuthenticated());
     } on ApiException catch (e) {
       emit(AuthError(e.message));
@@ -45,6 +46,7 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logout() async {
     await _storage.clearToken();
     await _storage.clearHrGroupId();
+    await _storage.clearEmpId();
     emit(const AuthUnauthenticated());
   }
 }

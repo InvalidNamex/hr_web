@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/auth_cubit.dart';
-import '../features/requests/presentation/request_types_cubit.dart';
 import '../core/localization/app_localizations.dart';
 import '../core/localization/locale_cubit.dart';
 import '../core/theme/theme_cubit.dart';
@@ -40,10 +39,7 @@ class _PermanentShell extends StatelessWidget {
     return Scaffold(
       body: Row(
         children: [
-          SizedBox(
-            width: 260,
-            child: _DrawerContent(onNav: (_) {}),
-          ),
+          SizedBox(width: 260, child: _DrawerContent(onNav: (_) {})),
           const VerticalDivider(width: 1),
           Expanded(child: child),
         ],
@@ -64,9 +60,7 @@ class _CollapsibleShell extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.appTitle)),
       drawer: Drawer(
-        child: _DrawerContent(
-          onNav: (_) => Navigator.of(context).pop(),
-        ),
+        child: _DrawerContent(onNav: (_) => Navigator.of(context).pop()),
       ),
       body: child,
     );
@@ -85,6 +79,8 @@ class _DrawerContent extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final location = GoRouterState.of(context).uri.toString();
+    final isHome = location == '/';
+    final isWorkflows = location.startsWith('/workflows');
     final langCode = context.watch<LocaleCubit>().state.locale.languageCode;
     final themeMode = context.watch<ThemeCubit>().state.mode;
 
@@ -115,7 +111,9 @@ class _DrawerContent extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: colorScheme.onPrimaryContainer.withValues(alpha: 0.1),
+                      color: colorScheme.onPrimaryContainer.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Image.asset(
@@ -129,9 +127,9 @@ class _DrawerContent extends StatelessWidget {
                     child: Text(
                       l.appTitle,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -139,57 +137,76 @@ class _DrawerContent extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: BlocBuilder<RequestTypesCubit, RequestTypesState>(
-              builder: (context, state) {
-                if (state is RequestTypesLoaded) {
-                  return ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    children: state.types.map((type) {
-                      final route = '/requests/${type.id}';
-                      final selected = location.startsWith(route);
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: ListTile(
-                          selected: selected,
-                          selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          leading: Icon(
-                            Icons.folder_outlined,
-                            color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-                          ),
-                          title: Text(
-                            type.localizedName(langCode),
-                            style: TextStyle(
-                              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                              color: selected ? colorScheme.primary : colorScheme.onSurface,
-                            ),
-                          ),
-                          onTap: () {
-                            onNav(route);
-                            context.go(route);
-                          },
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-                if (state is RequestTypesLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is RequestTypesError) {
-                  return Center(
-                    child: TextButton.icon(
-                      icon: const Icon(Icons.refresh),
-                      label: Text(l.retry),
-                      onPressed: () =>
-                          context.read<RequestTypesCubit>().loadTypes(),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    selected: isHome,
+                    selectedTileColor: colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
                     ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Icon(
+                      Icons.home_outlined,
+                      color: isHome
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    title: Text(
+                      l.home,
+                      style: TextStyle(
+                        fontWeight: isHome ? FontWeight.w600 : FontWeight.w400,
+                        color: isHome
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                    ),
+                    onTap: isHome
+                        ? null
+                        : () {
+                            onNav('/');
+                            context.go('/');
+                          },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    selected: isWorkflows,
+                    selectedTileColor: colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Icon(
+                      Icons.account_tree_outlined,
+                      color: isWorkflows
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    title: Text(
+                      l.workflows,
+                      style: TextStyle(
+                        fontWeight: isWorkflows
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: isWorkflows
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                    ),
+                    onTap: () {
+                      onNav('/workflows');
+                      context.go('/workflows');
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           const Divider(height: 1),
@@ -198,11 +215,16 @@ class _DrawerContent extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   leading: const Icon(Icons.language),
                   title: Text(l.language),
                   trailing: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(8),
@@ -219,15 +241,23 @@ class _DrawerContent extends StatelessWidget {
                   onTap: () => context.read<LocaleCubit>().toggleLocale(),
                 ),
                 ListTile(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  leading: Icon(themeMode == ThemeMode.dark
-                      ? Icons.light_mode
-                      : Icons.dark_mode),
-                  title: Text(themeMode == ThemeMode.dark ? l.lightMode : l.darkMode),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: Icon(
+                    themeMode == ThemeMode.dark
+                        ? Icons.light_mode
+                        : Icons.dark_mode,
+                  ),
+                  title: Text(
+                    themeMode == ThemeMode.dark ? l.lightMode : l.darkMode,
+                  ),
                   onTap: () => context.read<ThemeCubit>().toggleTheme(),
                 ),
                 ListTile(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   leading: const Icon(Icons.logout),
                   title: Text(l.logout),
                   onTap: () {

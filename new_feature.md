@@ -168,4 +168,305 @@ the groupDetails of which this workflow could work on:
         "requestTypeName": "{\"en\":\"Extend Vacation Request - NC\",\"ar\":\"طلب مد إجازة - NC\"}"
       }
     ]
-    
+
+    Continuation.
+    here is an endpoint that returns 3 lists of different models.
+    users list we shall call it something that doesn't conflict with our current names as it is new.
+    groups this is a list of groups we will use later as well.
+    requestTypes this is another list.
+    those three lists will later be implemented as drop downs for users to choose from.
+    for now create the models and and fetch data from api mount it in the lists for later use.
+    the new feature we're working on is "create new workflow".
+
+    /api/Web/GetWorkflowDropdowns?userGroupId=1
+    {
+  "success": true,
+  "message": "Success",
+  "dataCount": 1,
+  "data": {
+    "users": [
+      {
+        "id": 6,
+        "name": "{\"en\":\"ZAHER TAHA ZAHER TAHA YASSIN\",\"ar\":\"زاهر طه زاهر طه ياسين\"}"
+      },
+      {
+        "id": 388,
+        "name": "{\"en\":\"AMR ABDELGHAFFAR ELSAYED ELBRASHY\",\"ar\":\"عمرو  عبد الغفار السيد البراشي\"}"
+      }
+    ],
+    "groups": [
+      {
+        "id": 1,
+        "name": "Group 1"
+      },
+      {
+        "id": 2,
+        "name": "Group 2"
+      },
+      {
+        "id": 3,
+        "name": "Group 3"
+      },
+      {
+        "id": 4,
+        "name": "Group 4"
+      }
+    ],
+    "requestTypes": [
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 1,
+        "name": "{\"en\":\"Vacation Request - NC\",\"ar\":\"طلب إجازة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      },
+      {
+        "id": 2,
+        "name": "{\"en\":\"Loan Request - NC\",\"ar\":\"طلب سلفة - NC\"}"
+      }
+    ]
+  },
+  "body": null
+}
+
+where are we gonna include the New Workflow button?
+in workflows_page.dart
+              Text(
+                l.workflows,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ), next to this widget
+
+this will take us to a new screen.
+
+
+this is an example of the save model and endpoint.
+there shall be a textformfield mandatory for the name of workflow
+a growable table with 2 columns, column a has the index starting at one, and column b has a dropdownsearch loaded with the users we cached before from the previous endpoint/users.
+each time the user selects a user from this drop down a new record is revealed in the table prompting the user to add more users.
+all of the users along with their indexes starting from one shall be cached in a list called workflowUsers.
+current user can replace a user or delete a user from the list resetting the indexes.
+
+another section which is to bind groups which we cached to request types which we also cached.
+
+the user can add a new group, choose the group from a dropdown, then bind it to a requestType from dropdown as well.
+/api/Web/SaveWorkflow
+{
+  "Name": "Test2", // there shall be a textformfield mandatory for the name
+  "LoggedInUserId": 1, //this is current user Id
+  
+  "GroupDetails":
+    {
+      "GroupId": 1,
+      "RequestTypeId": 1
+    },
+    {
+      "GroupId": 1,
+      "RequestTypeId": 2
+    }
+  ],
+  "Steps": [ // we send the users from workflowUsers with their index starting at one
+    {
+      "StepNo": 1,
+      "EmpId": 5
+    },
+    {
+      "StepNo": 2,
+      "EmpId": 6
+    }
+  ]
+}

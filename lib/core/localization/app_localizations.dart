@@ -12,6 +12,7 @@ class AppLocalizations {
   static const _strings = {
     'en': {
       'app_title': 'HR Requests',
+      'home': 'Home',
       'login': 'Login',
       'username': 'Username',
       'password': 'Password',
@@ -20,6 +21,18 @@ class AppLocalizations {
       'requests': 'Requests',
       'all_requests': 'All Requests',
       'request_details': 'Request Details',
+      'workflows': 'Workflow',
+      'workflow_details': 'Workflow Details',
+      'workflow_id': 'Workflow ID',
+      'search_workflows': 'Search workflows by name...',
+      'sort_name_asc': 'Sort by name (A-Z)',
+      'sort_name_desc': 'Sort by name (Z-A)',
+      'creation_date': 'Creation Date',
+      'steps_count': 'Steps',
+      'workflow_steps': 'Workflow Steps',
+      'group_details': 'Group Details',
+      'group': 'Group',
+      'created_by': 'Created By',
       'execute': 'Execute',
       'undo': 'Undo',
       'execute_success': 'Request approved successfully.',
@@ -75,10 +88,29 @@ class AppLocalizations {
       'status_cancelled': 'Cancelled',
       'status_expired': 'Expired',
       'status_last_vacation_day': 'Last Vacation Day',
+      'workflow_save_success': 'Workflow saved successfully.',
+      'workflow_update_success': 'Workflow updated successfully.',
+      'new_workflow': 'New Workflow',
+      'edit_workflow': 'Edit Workflow',
+      'workflow_name': 'Workflow Name',
+      'workflow_name_hint': 'Enter workflow name',
+      'workflow_name_required': 'Workflow name is required',
+      'select_employee': 'Select employee',
+      'select_group': 'Select group',
+      'select_request_type': 'Select request type',
+      'add_group_binding': 'Add Group',
+      'no_group_bindings': 'No group bindings added. Tap + to add.',
+      'no_steps_error': 'Add at least one step',
+      'incomplete_binding_error': 'Complete all group bindings before saving',
+      'save': 'Save',
+      'remove': 'Remove',
+      'search_group': 'Search groups...',
+      'search_request_type': 'Search request types...',
       'status_unknown': 'Unknown',
     },
     'ar': {
       'app_title': 'طلبات الموارد البشرية',
+      'home': 'الرئيسية',
       'login': 'تسجيل الدخول',
       'username': 'اسم المستخدم',
       'password': 'كلمة المرور',
@@ -87,6 +119,18 @@ class AppLocalizations {
       'requests': 'الطلبات',
       'all_requests': 'جميع الطلبات',
       'request_details': 'تفاصيل الطلب',
+      'workflows': 'سلسلة الموافقات',
+      'workflow_details': 'تفاصيل سلسلة الموافقات',
+      'workflow_id': 'رقم سلسلة الموافقات',
+      'search_workflows': 'البحث في سلاسل الموافقات بالاسم...',
+      'sort_name_asc': 'ترتيب حسب الاسم (أ-ي)',
+      'sort_name_desc': 'ترتيب حسب الاسم (ي-أ)',
+      'creation_date': 'تاريخ الإنشاء',
+      'steps_count': 'عدد الخطوات',
+      'workflow_steps': 'خطوات سلسلة الموافقات',
+      'group_details': 'تفاصيل المجموعات',
+      'group': 'المجموعة',
+      'created_by': 'أنشئ بواسطة',
       'execute': 'تنفيذ',
       'undo': 'تراجع',
       'execute_success': 'تم اعتماد الطلب بنجاح.',
@@ -142,6 +186,24 @@ class AppLocalizations {
       'status_cancelled': 'ملغي',
       'status_expired': 'منتهية الصلاحية',
       'status_last_vacation_day': 'آخر يوم إجازة',
+      'workflow_save_success': 'تم حفظ سلسلة الموافقات بنجاح.',
+      'workflow_update_success': 'تم تحديث سلسلة الموافقات بنجاح.',
+      'new_workflow': 'سلسلة موافقات جديدة',
+      'edit_workflow': 'تعديل سلسلة الموافقات',
+      'workflow_name': 'اسم سلسلة الموافقات',
+      'workflow_name_hint': 'أدخل اسم سلسلة الموافقات',
+      'workflow_name_required': 'اسم سلسلة الموافقات مطلوب',
+      'select_employee': 'اختر الموظف',
+      'select_group': 'اختر المجموعة',
+      'select_request_type': 'اختر نوع الطلب',
+      'add_group_binding': 'إضافة مجموعة',
+      'no_group_bindings': 'لا توجد مجموعات مضافة. اضغط + للإضافة.',
+      'no_steps_error': 'أضف خطوة واحدة على الأقل',
+      'incomplete_binding_error': 'أكمل جميع ربط المجموعات قبل الحفظ',
+      'save': 'حفظ',
+      'remove': 'حذف',
+      'search_group': 'ابحث عن مجموعة...',
+      'search_request_type': 'ابحث عن نوع الطلب...',
       'status_unknown': 'غير معروف',
     },
   };
@@ -153,6 +215,7 @@ class AppLocalizations {
 
   // Convenience getters
   String get appTitle => get('app_title');
+  String get home => get('home');
   String get login => get('login');
   String get username => get('username');
   String get password => get('password');
@@ -161,6 +224,18 @@ class AppLocalizations {
   String get requests => get('requests');
   String get allRequests => get('all_requests');
   String get requestDetails => get('request_details');
+  String get workflows => get('workflows');
+  String get workflowDetails => get('workflow_details');
+  String get workflowId => get('workflow_id');
+  String get searchWorkflows => get('search_workflows');
+  String get sortNameAsc => get('sort_name_asc');
+  String get sortNameDesc => get('sort_name_desc');
+  String get creationDate => get('creation_date');
+  String get stepsCount => get('steps_count');
+  String get workflowSteps => get('workflow_steps');
+  String get groupDetails => get('group_details');
+  String get group => get('group');
+  String get createdBy => get('created_by');
   String get execute => get('execute');
   String get undo => get('undo');
   String get executeSuccess => get('execute_success');
@@ -216,15 +291,31 @@ class AppLocalizations {
   String get statusExpired => get('status_expired');
   String get statusLastVacationDay => get('status_last_vacation_day');
   String get statusUnknown => get('status_unknown');
+  String get workflowSaveSuccess => get('workflow_save_success');
+  String get workflowUpdateSuccess => get('workflow_update_success');
+  String get newWorkflow => get('new_workflow');
+  String get editWorkflow => get('edit_workflow');
+  String get workflowName => get('workflow_name');
+  String get workflowNameHint => get('workflow_name_hint');
+  String get workflowNameRequired => get('workflow_name_required');
+  String get selectEmployee => get('select_employee');
+  String get selectGroup => get('select_group');
+  String get selectRequestType => get('select_request_type');
+  String get addGroupBinding => get('add_group_binding');
+  String get noGroupBindings => get('no_group_bindings');
+  String get noStepsError => get('no_steps_error');
+  String get incompleteBindingError => get('incomplete_binding_error');
+  String get save => get('save');
+  String get remove => get('remove');
+  String get searchGroup => get('search_group');
+  String get searchRequestType => get('search_request_type');
 }
 
-class AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['en', 'ar'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => ['en', 'ar'].contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) async =>
