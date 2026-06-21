@@ -31,8 +31,8 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
   // null entry = empty / unfilled slot; always at least one null at the end
   final List<WorkflowDropdownUser?> _steps = [null];
 
-  // Each _GroupBinding holds a chosen group + requestType (both may be null)
-  final List<_GroupBinding> _groupBindings = [];
+  WorkflowDropdownGroup? _selectedGroup;
+  final Set<int> _selectedRequestTypeIds = {};
 
   @override
   void initState() {
@@ -51,16 +51,15 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
         );
       }
       _steps.add(null); // trailing empty slot
-      for (final gd in initial.groupDetails) {
-        _groupBindings.add(
-          _GroupBinding()
-            ..group = WorkflowDropdownGroup(id: gd.groupId, name: gd.groupName)
-            ..requestType = WorkflowDropdownRequestType(
-              id: gd.requestTypeId,
-              name: gd.requestTypeName,
-              nameAr: gd.requestTypeNameAr,
-            ),
+      if (initial.groupDetails.isNotEmpty) {
+        final firstGd = initial.groupDetails.first;
+        _selectedGroup = WorkflowDropdownGroup(
+          id: firstGd.groupId,
+          name: firstGd.groupName,
         );
+        for (final gd in initial.groupDetails) {
+          _selectedRequestTypeIds.add(gd.requestTypeId);
+        }
       }
     }
     context.read<CreateWorkflowCubit>().loadDropdowns();
@@ -87,14 +86,6 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
       if (_steps.isEmpty || _steps.last != null) _steps.add(null);
     });
   }
-
-  // ── Group-binding management ─────────────────────────────────────────────
-
-  void _addGroupBinding() =>
-      setState(() => _groupBindings.add(_GroupBinding()));
-
-  void _removeGroupBinding(int index) =>
-      setState(() => _groupBindings.removeAt(index));
 
   // ── Generic picker bottom-sheet ──────────────────────────────────────────
 
@@ -132,13 +123,18 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
       return;
     }
 
-    for (final b in _groupBindings) {
-      if (b.group == null || b.requestType == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(l.incompleteBindingError)));
-        return;
-      }
+    if (_selectedGroup == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.noGroupError)));
+      return;
+    }
+
+    if (_selectedRequestTypeIds.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l.noRequestTypesError)));
+      return;
     }
 
     final steps = filledSteps
@@ -147,11 +143,11 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
         .map((e) => SaveWorkflowStep(stepNo: e.key + 1, empId: e.value.id))
         .toList();
 
-    final groupDetails = _groupBindings
+    final groupDetails = _selectedRequestTypeIds
         .map(
-          (b) => SaveWorkflowGroupDetail(
-            groupId: b.group!.id,
-            requestTypeId: b.requestType!.id,
+          (rtId) => SaveWorkflowGroupDetail(
+            groupId: _selectedGroup!.id,
+            requestTypeId: rtId,
           ),
         )
         .toList();
@@ -441,96 +437,66 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l.groupDetails,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            TextButton.icon(
-              onPressed: isSaving ? null : _addGroupBinding,
-              icon: const Icon(Icons.add),
-              label: Text(l.addGroupBinding),
-            ),
-          ],
+        // ── Group picker ──────────────────────────────────────────────
+        Text(
+          l.groupDetails,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
-        if (_groupBindings.isEmpty)
+        const SizedBox(height: 12),
+        _PickerField(
+          displayText: _selectedGroup?.name,
+          hint: l.selectGroup,
+          enabled: !isSaving,
+          onTap: () => _pickItem<WorkflowDropdownGroup>(
+            items: dropdowns.groups,
+            display: (g) => g.name,
+            onSelected: (g) => setState(() => _selectedGroup = g),
+            searchHint: l.searchGroup,
+          ),
+        ),
+        const SizedBox(height: 24),
+
+        // ── Request types checklist ───────────────────────────────────
+        Text(
+          l.requestTypes,
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        if (dropdowns.requestTypes.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              l.noGroupBindings,
+              l.noData,
               style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           )
         else
-          ...List.generate(_groupBindings.length, (index) {
-            final binding = _groupBindings[index];
-            return Card(
-              margin: const EdgeInsets.only(bottom: 8),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 4, 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          _PickerField(
-                            displayText: binding.group?.name,
-                            hint: l.selectGroup,
-                            enabled: !isSaving,
-                            onTap: () => _pickItem<WorkflowDropdownGroup>(
-                              items: dropdowns.groups,
-                              display: (g) => g.name,
-                              onSelected: (g) =>
-                                  setState(() => binding.group = g),
-                              searchHint: l.searchGroup,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          _PickerField(
-                            displayText: binding.requestType?.localizedName(
-                              langCode,
-                            ),
-                            hint: l.selectRequestType,
-                            enabled: !isSaving,
-                            onTap: () => _pickItem<WorkflowDropdownRequestType>(
-                              items: dropdowns.requestTypes,
-                              display: (rt) => rt.localizedName(langCode),
-                              onSelected: (rt) =>
-                                  setState(() => binding.requestType = rt),
-                              searchHint: l.searchRequestType,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: isSaving
-                          ? null
-                          : () => _removeGroupBinding(index),
-                      icon: const Icon(Icons.delete_outline),
-                      color: colorScheme.error,
-                      tooltip: l.remove,
-                    ),
-                  ],
-                ),
-              ),
+          ...dropdowns.requestTypes.map((rt) {
+            final isSelected = _selectedRequestTypeIds.contains(rt.id);
+            return CheckboxListTile(
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+              title: Text(rt.localizedName(langCode)),
+              value: isSelected,
+              enabled: !isSaving,
+              onChanged: (checked) {
+                setState(() {
+                  if (checked == true) {
+                    _selectedRequestTypeIds.add(rt.id);
+                  } else {
+                    _selectedRequestTypeIds.remove(rt.id);
+                  }
+                });
+              },
             );
           }),
       ],
     );
   }
-}
-
-// ── Local helper classes ─────────────────────────────────────────────────────
-
-class _GroupBinding {
-  WorkflowDropdownGroup? group;
-  WorkflowDropdownRequestType? requestType;
 }
 
 // ── Picker trigger field ─────────────────────────────────────────────────────

@@ -14,6 +14,7 @@ class WorkflowsPage extends StatefulWidget {
 
 class _WorkflowsPageState extends State<WorkflowsPage> {
   final _searchController = TextEditingController();
+  GoRouter? _router;
 
   @override
   void initState() {
@@ -22,7 +23,25 @@ class _WorkflowsPageState extends State<WorkflowsPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_router == null) {
+      _router = GoRouter.of(context);
+      _router!.routerDelegate.addListener(_onRouteChange);
+    }
+  }
+
+  void _onRouteChange() {
+    if (!mounted) return;
+    final path = _router!.routerDelegate.currentConfiguration.uri.path;
+    if (path == '/workflows') {
+      context.read<WorkflowsCubit>().loadWorkflows();
+    }
+  }
+
+  @override
   void dispose() {
+    _router?.routerDelegate.removeListener(_onRouteChange);
     _searchController.dispose();
     super.dispose();
   }
@@ -137,7 +156,9 @@ class _WorkflowsPageState extends State<WorkflowsPage> {
                         ),
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => context.push('/workflows/${item.id}'),
+                      onTap: () {
+                        context.push('/workflows/${item.id}');
+                      },
                     ),
                   );
                 },

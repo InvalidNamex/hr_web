@@ -106,6 +106,9 @@ class AppLocalizations {
       'remove': 'Remove',
       'search_group': 'Search groups...',
       'search_request_type': 'Search request types...',
+      'no_group_error': 'Select a group before saving',
+      'no_request_types_error': 'Select at least one request type',
+      'request_types': 'Request Types',
       'status_unknown': 'Unknown',
     },
     'ar': {
@@ -204,6 +207,9 @@ class AppLocalizations {
       'remove': 'حذف',
       'search_group': 'ابحث عن مجموعة...',
       'search_request_type': 'ابحث عن نوع الطلب...',
+      'no_group_error': 'اختر مجموعة قبل الحفظ',
+      'no_request_types_error': 'اختر نوع طلب واحد على الأقل',
+      'request_types': 'أنواع الطلبات',
       'status_unknown': 'غير معروف',
     },
   };
@@ -309,6 +315,9 @@ class AppLocalizations {
   String get remove => get('remove');
   String get searchGroup => get('search_group');
   String get searchRequestType => get('search_request_type');
+  String get noGroupError => get('no_group_error');
+  String get noRequestTypesError => get('no_request_types_error');
+  String get requestTypes => get('request_types');
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
