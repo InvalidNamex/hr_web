@@ -4,8 +4,8 @@ class AppConstants {
   AppConstants._();
 
   // static const String _localProxyUrl = 'http://localhost:8080';
-  static const String _remoteUrl = 'https://192.168.100.203';
-  // static const String _remoteUrl = 'https://natureccmpany.homeip.net:57571';
+  // static const String _remoteUrl = 'https://192.168.100.203';
+  static const String _remoteUrl = 'https://natureccmpany.homeip.net:57572';
 
   /// Optional override with `--dart-define=API_BASE_URL=...`.
   ///

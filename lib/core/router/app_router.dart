@@ -17,6 +17,14 @@ import '../../features/requests/presentation/workflows_cubit.dart';
 import '../../features/requests/presentation/workflow_detail_cubit.dart';
 import '../../features/requests/presentation/create_workflow_cubit.dart';
 import '../../features/requests/data/requests_remote_datasource.dart';
+import '../../features/groups/data/group_models.dart';
+import '../../features/groups/data/groups_remote_datasource.dart';
+import '../../features/groups/pages/groups_screen.dart';
+import '../../features/groups/pages/group_form_page.dart';
+import '../../features/groups/pages/group_members_page.dart';
+import '../../features/groups/presentation/groups_cubit.dart';
+import '../../features/groups/presentation/group_form_cubit.dart';
+import '../../features/groups/presentation/group_members_cubit.dart';
 import '../../core/storage/storage_service.dart';
 import '../../di.dart';
 import '../../app_shell.dart';
@@ -137,6 +145,51 @@ GoRouter createRouter(AuthCubit authCubit) {
                 ],
               ),
             ],
+          ),
+          GoRoute(
+            path: '/groups',
+            builder: (context, state) => BlocProvider(
+              create: (_) => GroupsCubit(getIt<GroupsRemoteDataSource>()),
+              child: const GroupsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/groups/new',
+            builder: (context, state) => BlocProvider(
+              create: (_) => GroupFormCubit(
+                getIt<GroupsRemoteDataSource>(),
+                getIt<StorageService>(),
+              ),
+              child: const GroupFormPage(),
+            ),
+          ),
+          GoRoute(
+            path: '/groups/:groupId/edit',
+            builder: (context, state) {
+              final group = state.extra as Group?;
+              return BlocProvider(
+                create: (_) => GroupFormCubit(
+                  getIt<GroupsRemoteDataSource>(),
+                  getIt<StorageService>(),
+                ),
+                child: GroupFormPage(initialGroup: group),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/groups/:groupId/members',
+            builder: (context, state) {
+              final groupId = int.parse(state.pathParameters['groupId']!);
+              final groupName = (state.extra as String?) ?? '';
+              return BlocProvider(
+                create: (_) =>
+                    GroupMembersCubit(getIt<GroupsRemoteDataSource>()),
+                child: GroupMembersPage(
+                  groupId: groupId,
+                  groupName: groupName,
+                ),
+              );
+            },
           ),
         ],
       ),

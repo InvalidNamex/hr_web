@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'features/requests/data/requests_remote_datasource.dart';
 import 'features/auth/data/auth_remote_datasource.dart';
+import 'features/groups/data/groups_remote_datasource.dart';
 import 'core/storage/storage_service.dart';
 import 'core/network/dio_client.dart';
 
@@ -11,6 +12,7 @@ class _ServiceLocator {
   late AuthInterceptor _authInterceptor;
   late AuthRemoteDataSource authDataSource;
   late RequestsRemoteDataSource requestsDataSource;
+  late GroupsRemoteDataSource groupsDataSource;
   bool _initialized = false;
 
   set onUnauthorized(void Function()? cb) => _authInterceptor.onUnauthorized = cb;
@@ -22,6 +24,7 @@ class _ServiceLocator {
     dio = DioClient.create(storage, _authInterceptor);
     authDataSource = AuthRemoteDataSource(dio);
     requestsDataSource = RequestsRemoteDataSource(dio);
+    groupsDataSource = GroupsRemoteDataSource(dio);
     _initialized = true;
   }
 
@@ -30,6 +33,7 @@ class _ServiceLocator {
     if (T == Dio) return dio as T;
     if (T == AuthRemoteDataSource) return authDataSource as T;
     if (T == RequestsRemoteDataSource) return requestsDataSource as T;
+    if (T == GroupsRemoteDataSource) return groupsDataSource as T;
     throw StateError('Unknown type $T');
   }
 }

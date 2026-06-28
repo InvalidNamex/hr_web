@@ -206,6 +206,41 @@ class _DrawerContent extends StatelessWidget {
                     },
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: ListTile(
+                    selected: location.startsWith('/groups'),
+                    selectedTileColor: colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    leading: Icon(
+                      Icons.group_outlined,
+                      color: location.startsWith('/groups')
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    title: Text(
+                      l.groupsManagement,
+                      style: TextStyle(
+                        fontWeight: location.startsWith('/groups')
+                            ? FontWeight.w600
+                            : FontWeight.w400,
+                        color: location.startsWith('/groups')
+                            ? colorScheme.primary
+                            : colorScheme.onSurface,
+                      ),
+                    ),
+                    onTap: location.startsWith('/groups')
+                        ? null
+                        : () {
+                            onNav('/groups');
+                            context.go('/groups');
+                          },
+                  ),
+                ),
               ],
             ),
           ),

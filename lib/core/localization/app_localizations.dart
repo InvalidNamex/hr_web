@@ -110,6 +110,24 @@ class AppLocalizations {
       'no_request_types_error': 'Select at least one request type',
       'request_types': 'Request Types',
       'status_unknown': 'Unknown',
+      'groups_management': 'Groups Management',
+      'new_group': 'New Group',
+      'edit_group': 'Edit Group',
+      'group_name': 'Group Name',
+      'group_name_hint': 'Enter group name',
+      'group_name_required': 'Group name is required',
+      'search_groups': 'Search groups...',
+      'delete_group': 'Delete Group',
+      'delete_group_confirm': 'Are you sure you want to delete group "{name}"?',
+      'group_save_success': 'Group saved successfully.',
+      'group_update_success': 'Group updated successfully.',
+      'company': 'Business Unit',
+      'search_company': 'Search business units...',
+      'select_company_error': 'Please select a business unit',
+      'employees': 'Employees',
+      'delete': 'Delete',
+      'selected': 'Selected',
+      'group_members': 'Group Members',
     },
     'ar': {
       'app_title': 'طلبات الموارد البشرية',
@@ -211,6 +229,24 @@ class AppLocalizations {
       'no_request_types_error': 'اختر نوع طلب واحد على الأقل',
       'request_types': 'أنواع الطلبات',
       'status_unknown': 'غير معروف',
+      'groups_management': 'إدارة المجموعات',
+      'new_group': 'مجموعة جديدة',
+      'edit_group': 'تعديل المجموعة',
+      'group_name': 'اسم المجموعة',
+      'group_name_hint': 'أدخل اسم المجموعة',
+      'group_name_required': 'اسم المجموعة مطلوب',
+      'search_groups': 'ابحث عن مجموعة...',
+      'delete_group': 'حذف المجموعة',
+      'delete_group_confirm': 'هل أنت متأكد من حذف المجموعة "{name}"؟',
+      'group_save_success': 'تم حفظ المجموعة بنجاح.',
+      'group_update_success': 'تم تحديث المجموعة بنجاح.',
+      'company': 'منشأة',
+      'search_company': 'ابحث عن منشأة...',
+      'select_company_error': 'يرجى اختيار منشأة',
+      'employees': 'الموظفون',
+      'delete': 'حذف',
+      'selected': 'المحدد',
+      'group_members': 'أعضاء المجموعة',
     },
   };
 
@@ -318,6 +354,25 @@ class AppLocalizations {
   String get noGroupError => get('no_group_error');
   String get noRequestTypesError => get('no_request_types_error');
   String get requestTypes => get('request_types');
+  String get groupsManagement => get('groups_management');
+  String get newGroup => get('new_group');
+  String get editGroup => get('edit_group');
+  String get groupName => get('group_name');
+  String get groupNameHint => get('group_name_hint');
+  String get groupNameRequired => get('group_name_required');
+  String get searchGroups => get('search_groups');
+  String get deleteGroup => get('delete_group');
+  String deleteGroupConfirm(String name) =>
+      get('delete_group_confirm').replaceAll('{name}', name);
+  String get groupSaveSuccess => get('group_save_success');
+  String get groupUpdateSuccess => get('group_update_success');
+  String get company => get('company');
+  String get searchCompany => get('search_company');
+  String get selectCompanyError => get('select_company_error');
+  String get employees => get('employees');
+  String get delete => get('delete');
+  String get selected => get('selected');
+  String get groupMembers => get('group_members');
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
