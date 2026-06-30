@@ -89,12 +89,15 @@ class CreateWorkflowCubit extends Cubit<CreateWorkflowState> {
           jsonDecode(utf8.decode(base64Url.decode(normalized))) as Map<String, dynamic>;
 
       final dynamic raw =
+          payload['userId'] ??
+          payload['UserId'] ??
           payload['empId'] ??
           payload['EmpId'] ??
           payload['empID'] ??
           payload['EmpID'] ??
           payload['employeeId'] ??
           payload['EmployeeId'] ??
+          payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
           payload['id'] ??
           payload['ID'] ??
           payload['sub'];

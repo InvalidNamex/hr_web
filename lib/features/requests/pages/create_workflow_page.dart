@@ -358,6 +358,8 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
     String langCode,
     bool isSaving,
   ) {
+    final hasUsers = dropdowns.users.isNotEmpty;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -368,6 +370,16 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
+        if (!hasUsers)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              l.noData,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
         ...List.generate(_steps.length, (index) {
           final user = _steps[index];
           return Padding(
@@ -395,7 +407,7 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
                   child: _PickerField(
                     displayText: user?.localizedName(langCode),
                     hint: l.selectEmployee,
-                    enabled: !isSaving,
+                    enabled: !isSaving && hasUsers,
                     onTap: () => _pickItem<WorkflowDropdownUser>(
                       items: dropdowns.users,
                       display: (u) => u.localizedName(langCode),
@@ -433,6 +445,8 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
     bool isSaving,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
+    final hasGroups = dropdowns.groups.isNotEmpty;
+    final hasRequestTypes = dropdowns.requestTypes.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,7 +462,7 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
         _PickerField(
           displayText: _selectedGroup?.name,
           hint: l.selectGroup,
-          enabled: !isSaving,
+          enabled: !isSaving && hasGroups,
           onTap: () => _pickItem<WorkflowDropdownGroup>(
             items: dropdowns.groups,
             display: (g) => g.name,
@@ -456,6 +470,14 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
             searchHint: l.searchGroup,
           ),
         ),
+        if (!hasGroups)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              l.noData,
+              style: TextStyle(color: colorScheme.onSurfaceVariant),
+            ),
+          ),
         const SizedBox(height: 24),
 
         // ── Request types checklist ───────────────────────────────────
@@ -466,7 +488,7 @@ class _CreateWorkflowPageState extends State<CreateWorkflowPage> {
           ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 8),
-        if (dropdowns.requestTypes.isEmpty)
+        if (!hasRequestTypes)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(

@@ -17,21 +17,27 @@ class LoginResponse extends Equatable {
     required this.token,
     required this.hrGroupId,
     required this.hrGroupName,
-    this.empId = 0,
+    this.userId = 0,
   });
 
   final String token;
   final String hrGroupId;
   final String hrGroupName;
 
-  /// The logged-in employee's ID (used for workflow creation). Defaults to 0
-  /// if the API does not return this field.
-  final int empId;
+  /// The logged-in user's ID.
+  final int userId;
+
+  /// Backward-compatible alias used across existing feature code.
+  int get empId => userId;
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     // API wraps data in a "data" key
     final data = json['data'] as Map<String, dynamic>? ?? json;
-      final empIdRaw =
+    final userIdRaw =
+          data['userId'] ??
+          data['UserId'] ??
+          data['userID'] ??
+          data['UserID'] ??
           data['empId'] ??
           data['EmpId'] ??
           data['empID'] ??
@@ -45,10 +51,10 @@ class LoginResponse extends Equatable {
       token: data['token'] as String,
       hrGroupId: data['hrGroupId'] as String,
       hrGroupName: data['hrGroupName'] as String,
-      empId: empIdRaw is int ? empIdRaw : int.tryParse('$empIdRaw') ?? 0,
+      userId: userIdRaw is int ? userIdRaw : int.tryParse('$userIdRaw') ?? 0,
     );
   }
 
   @override
-  List<Object?> get props => [token, hrGroupId, hrGroupName, empId];
+  List<Object?> get props => [token, hrGroupId, hrGroupName, userId];
 }

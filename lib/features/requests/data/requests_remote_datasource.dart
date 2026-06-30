@@ -116,7 +116,20 @@ class RequestsRemoteDataSource {
         '/api/Web/GetWorkflowDropdowns',
         queryParameters: {'userGroupId': userGroupId},
       );
-      return WorkflowDropdowns.fromJson(response.data as Map<String, dynamic>);
+      final body = response.data;
+      if (body is Map<String, dynamic>) {
+        return WorkflowDropdowns.fromJson(body);
+      }
+      if (body is Map) {
+        return WorkflowDropdowns.fromJson(Map<String, dynamic>.from(body));
+      }
+
+      // Gracefully degrade to empty dropdowns when payload shape is unexpected.
+      return const WorkflowDropdowns(
+        users: [],
+        groups: [],
+        requestTypes: [],
+      );
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
     }

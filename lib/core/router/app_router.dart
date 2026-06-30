@@ -81,6 +81,7 @@ GoRouter createRouter(AuthCubit authCubit) {
                       BlocProvider(
                         create: (_) => ExecuteVacationCubit(
                           getIt<RequestsRemoteDataSource>(),
+                          getIt<StorageService>(),
                         ),
                       ),
                     ],
